@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 
-import rclpy
-from rclpy.node import Node
+import rospy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist, Vector3
 
 import numpy as np
 import math
 
-class TeleopControl(Node):
 
+class TeleopControl():
     def __init__(self):
-        super().__init__('teleop_control_node')
-        self.jsub = self.create_subscription(
-            Joy, '/joy', self.convert_joy, 10
-        )
 
-        self.vel_pub = self.create_publisher(Twist, '/uuv/cmd_twist', 10)
+        self.sub = rospy.Sucriber('/joy', Joy, TeleopControl.convert_joy)
+        self.pub = rospy.Publisher('/uuv/cmd_twist', Twist, 10)
+        rospy.init_node('teleop_control_node', anonymous=True)
+
         self.vel_msg = Twist()
 
         self.current_vel = np.zeros(6)
         self.dt = 0.1
-    
+
+        rospy.spin()
+
     def convert_joy(self, msg):
         roll_ax = 0
         pitch_ax = 1
@@ -58,14 +58,12 @@ class TeleopControl(Node):
 
         self.vel_msg.linear= Vector3(x = self.current_vel[0], y = self.current_vel[1], z = self.current_vel[2])
         self.vel_msg.angular= Vector3(x = self.current_vel[3], y = self.current_vel[4], z = self.current_vel[5])
-        self.vel_pub.publish(self.vel_msg)
+        self.pub.publish(self.vel_msg)
 
 def main(args=None):
-    rclpy.init(args=args)
     rmn = TeleopControl()
-    rclpy.spin(rmn)
-    rmn.destroy_node()
-    rclpy.shutdown()
+
+
 
 if __name__ == '__main__':
     main()

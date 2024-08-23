@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables for docker run
-IMAGE_NAME=uuv_img
+IMAGE_NAME=uuv_teleop
 CONTAINER_NAME=uuv_cntnr
 
 DOCKER_COMMAND="docker run"
